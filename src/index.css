@@ -204,7 +204,6 @@ Grocery List
 .task {
   padding: 0.5rem;
   padding-left: 1rem;
-  padding-bottom: 1rem;
   background: var(--clr-grey-10);
   border-top-left-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
