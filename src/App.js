@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState } from "react";
+// import { useEffect } from "react";
 import List from "./List";
 import Alert from "./Alert";
 import { connect } from "react-redux";
@@ -9,88 +11,50 @@ import { connect } from "react-redux";
 //   } else return [];
 // };
 
-function App({ dispatch,searchedList }) {
+function App({ dispatch, searchedList, editName, list }) {
+  // useStates
   const [name, setName] = useState("");
-  const [list, setList] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editId, setEditId] = useState(null);
   const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
-  const [searchTerm, setSearchTerm] = useState("");
+  // useRef
   const searchValue = React.useRef("");
-  const [filteredList, setFilteredList] = useState(list);
-
+  // main functions
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name) {
       showAlert(true, "danger", "please enter value");
     } else if (name && isEditing) {
-      dispatch({ type: "END_EDIT",payload:name });
-      // setList(
-      //   list.map((item) => {
-      //     if (item.id === editId) {
-      //       return { ...item, title: name };
-      //       return item;
-      //     }
-      //   })
-      // );
-      // setFilteredList(
-      //   filteredList.map((item) => {
-      //     if (item.id === editId) {
-      //       return { ...item, title: name };
-      //       return item;
-      //     }
-      //   })
-      // );
-      // setEditId(null);
+      dispatch({ type: "END_EDIT", payload: name });
       setName("");
       setIsEditing(false);
       showAlert(true, "success", "value changed");
     } else {
-      dispatch({ type: "ADD_TASK",payload:name });
+      dispatch({ type: "ADD_TASK", payload: name });
       showAlert(true, "success", "item added to the list");
       setName("");
-
-      const newItem = { id: new Date().getTime().toString(), title: name };
-      setList([...list, newItem]);
-      setFilteredList([...list, newItem]);
     }
   };
-
-  const searchTasks = () => {
-    dispatch({ type: "SEARCH_TASK",payload:searchValue.current.value });
-    setSearchTerm(searchValue.current.value);
-    let newList = list.filter((specificItem) => {
-      return specificItem.title
-        .toLowerCase()
-        .includes(searchValue.current.value);
-    });
-    setFilteredList(newList);
-
-    if (searchValue.current.value.length < 1) {
-      setFilteredList(list);
-    }
-  };
+  // alert function
   const showAlert = (show = false, type = "", msg = "") => {
     setAlert({ show, type, msg });
   };
+  // basic functions
+  const searchTasks = () => {
+    dispatch({ type: "SEARCH_TASK", payload: searchValue.current.value });
+  };
+
   const clearlist = () => {
     showAlert(true, "danger", "Empty List");
     dispatch({ type: "CLEAR_LIST" });
-    // setList([]);
-    // setFilteredList([])
   };
   const removeItem = (id) => {
     showAlert(true, "danger", "item removed");
-    dispatch({ type: "REMOVE_TASK",payload:id })
-    // setList(list.filter((item) => item.id !== id));
-    // setFilteredList(list);
+    dispatch({ type: "REMOVE_TASK", payload: id });
   };
   const editItem = (id) => {
-    dispatch({ type: "EDIT_TASK",payload:id })
+    dispatch({ type: "EDIT_TASK", payload: id });
     setIsEditing(true);
-    const specificItem = list.find((item) => item.id === id);
-    setName(specificItem.title);
-    // setEditId(id);
+    setName(editName);
   };
   // useEffect(() => {
   //   localStorage.setItem("list", JSON.stringify(list));
@@ -106,13 +70,13 @@ function App({ dispatch,searchedList }) {
           <input
             type="text"
             className="task"
-            placeholder="e.g.eggs"
+            placeholder="homework"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <button type="submit" className="submit-btn">
-            {isEditing ? "edit" : "submit"}
+            {isEditing ? "Edit" : "Add"}
           </button>
         </div>
       </form>
@@ -131,13 +95,9 @@ function App({ dispatch,searchedList }) {
 
       {list.length > 0 && (
         <div className="task-container">
-          <List
-            items={searchedList}
-            removeItem={removeItem}
-            editItem={editItem}
-          />
+          <List removeItem={removeItem} editItem={editItem} />
           <button className="clear-btn" onClick={clearlist}>
-            clear items
+            clear Tasks
           </button>
         </div>
       )}
@@ -145,8 +105,8 @@ function App({ dispatch,searchedList }) {
   );
 }
 function mapStateToProps(state) {
-  const { list, searchedList, searchTerm } = state;
+  const { list, searchedList, searchTerm, editName } = state;
 
-  return { list, searchedList, searchTerm };
+  return { list, searchedList, searchTerm, editName };
 }
 export default connect(mapStateToProps)(App);

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-const initialStore = {
+let initialStore = {
   list: [],
   searchedList: [],
   searchTerm: "",
   editId: null,
+  editName: "",
 };
 // const [editId, setEditId] = useState(null);
 // const [filteredList, setFilteredList] = useState('');
@@ -34,26 +34,27 @@ function reducer(state = initialStore, action) {
     };
   }
   if (action.type === "EDIT_TASK") {
-    const specificItemId = state.list.find(
-      (item) => item.id === action.payload
-    );
+    let specificItem = state.list.find((item) => item.id === action.payload);
     return {
       ...state,
       editId: action.payload,
+      editName: specificItem.title,
     };
   }
   if (action.type === "END_EDIT") {
     const newList = state.list.map((item) => {
+      if(item){
       if (item.id === state.editId) {
+        const { title } = item;
         return { ...item, title: action.payload };
         return item;
-      }
+      }}
     });
     return {
       ...state,
-      list: newList,
       searchedList: newList,
       editId: null,
+      //   editName:action.payload
     };
   }
   if (action.type === "SEARCH_TASK") {
