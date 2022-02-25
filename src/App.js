@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import List from "./List";
 import Alert from "./Alert";
 
-const getLocalStorage = () => {
-  let list = localStorage.getItem("list");
-  if (list) {
-    return JSON.parse(localStorage.getItem("list"));
-  } else return [];
-};
+// const getLocalStorage = () => {
+//   let list = localStorage.getItem("list");
+//   if (list) {
+//     return JSON.parse(localStorage.getItem("list"));
+//   } else return [];
+// };
 
 function App() {
   const [name, setName] = useState("");
-  const [list, setList] = useState(getLocalStorage());
+  const [list, setList] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
@@ -33,25 +33,35 @@ function App() {
           }
         })
       );
+      setFilteredList(
+        filteredList.map((item) => {
+          if (item.id === editId) {
+            return { ...item, title: name };
+            return item;
+          }
+        })
+      );
       setName("");
       setEditId(null);
       setIsEditing(false);
       showAlert(true, "success", "value changed");
-      setFilteredList(list)
+    
     } else {
       showAlert(true, "success", "item added to the list");
       const newItem = { id: new Date().getTime().toString(), title: name };
       setList([...list, newItem]);
       setName("");
       setFilteredList([...list, newItem])
+      
     }
   };
+  console.log(list)
   const searchTasks = () => {
     setSearchTerm(searchValue.current.value);
     let newList = list.filter((specificItem) => {
       return specificItem.title
         .toLowerCase()
-        .startsWith(searchValue.current.value);
+        .includes(searchValue.current.value);
     });
     setFilteredList(newList);
 
@@ -78,9 +88,9 @@ function App() {
     setEditId(id);
     setName(specificItem.title);
   };
-  useEffect(() => {
-    localStorage.setItem("list", JSON.stringify(list));
-  }, [list]);
+  // useEffect(() => {
+  //   localStorage.setItem("list", JSON.stringify(list));
+  // }, [list]);
 
   return (
     <section className="section-center">
@@ -92,7 +102,7 @@ function App() {
           <input
             type="text"
             className="task"
-            placeholder="search by task name"
+            placeholder="e.g.eggs"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
