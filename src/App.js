@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import axios from "axios";
 const BASE_URL = "http://localhost:5000/api/v1/tasks";
 
-function App({ dispatch,list,}) {
+function App({ dispatch, list }) {
   // useStates
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -20,11 +20,11 @@ function App({ dispatch,list,}) {
   const getalltasks = () => {
     try {
       axios.get(BASE_URL).then((res) => {
-        dispatch({ type: "GET_ALL_TASKS",payload: res.data });   
-       });;
-     } catch (error) {
-       console.log(error);
-     }
+        dispatch({ type: "GET_ALL_TASKS", payload: res.data });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // main functions
@@ -34,12 +34,14 @@ function App({ dispatch,list,}) {
       showAlert(true, "danger", "please enter two value");
     } else if (name && description && isEditing) {
       try {
-        (async()=>{await axios.put((`${BASE_URL}/${editId}`), {
-          title: name,
-          description: description,
-       })})()
-        
-        (async()=>{await getalltasks()})()  
+        (async () => {
+          await axios.put(`${BASE_URL}/${editId}`, {
+            title: name,
+            description: description,
+          });
+        })()(async () => {
+          await getalltasks();
+        })();
       } catch (error) {
         console.log(error);
       }
@@ -49,14 +51,18 @@ function App({ dispatch,list,}) {
       showAlert(true, "success", "value changed");
     } else {
       try {
-        (async()=>{await axios.post((BASE_URL), {
-          title: name,
-          description: description,
-        })})()
+        (async () => {
+          await axios.post(BASE_URL, {
+            title: name,
+            description: description,
+          });
+        })();
         showAlert(true, "success", "item added to the list");
         setName("");
         setDescription("");
-        (async()=>{await getalltasks()})()
+        (async () => {
+          await getalltasks();
+        })();
       } catch (error) {
         console.log(error);
       }
@@ -73,7 +79,9 @@ function App({ dispatch,list,}) {
 
   const clearlist = () => {
     try {
-      (async()=>{await axios.delete(BASE_URL)})()
+      (async () => {
+        await axios.delete(BASE_URL);
+      })();
       showAlert(true, "danger", "Empty List");
       dispatch({ type: "CLEAR_LIST" });
     } catch (error) {
@@ -83,26 +91,30 @@ function App({ dispatch,list,}) {
   };
   const removeItem = (id) => {
     try {
-      (async()=>{await axios.delete(`${BASE_URL}/${id}`)})()
-      ;
-      (async()=>{await getalltasks()})()
-    showAlert(true, "danger", "item removed");
+      (async () => {
+        await axios.delete(`${BASE_URL}/${id}`);
+      })();
+      (async () => {
+        await getalltasks();
+      })();
+      showAlert(true, "danger", "item removed");
     } catch (error) {
       console.log(error);
       showAlert(true, "danger", "something went wrong");
     }
-    
   };
   const editItem = (id, title, description) => {
     setIsEditing(true);
     setName(title);
     setDescription(description);
-    setEditId(id)
+    setEditId(id);
   };
   useEffect(() => {
-    (async()=>{await getalltasks()})()
+    (async () => {
+      await getalltasks();
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleSubmit]);
+  }, [alert]);
 
   return (
     <section className="section-center">
@@ -161,8 +173,8 @@ function App({ dispatch,list,}) {
   );
 }
 function mapStateToProps(state) {
-  const { list, } = state;
+  const { list } = state;
 
-  return { list, };
+  return { list };
 }
 export default connect(mapStateToProps)(App);

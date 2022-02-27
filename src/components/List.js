@@ -8,8 +8,8 @@ const List = ({ searchedList, removeItem, editItem }) => {
         if (item) {
           const { id, title, description } = item;
           return (
-            <div className="task-wrapper"key={id}>
-              <article  className="task-item">
+            <div className="task-wrapper" key={id}>
+              <article className="task-item">
                 <h4 className="title">{title}</h4>
                 <div className="btn-container">
                   <button
@@ -33,7 +33,9 @@ const List = ({ searchedList, removeItem, editItem }) => {
               </article>
             </div>
           );
-        }else{return<></>}
+        } else {
+          return <></>;
+        }
       })}
     </>
   );

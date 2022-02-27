@@ -10,12 +10,12 @@ function reducer(state = initialStore, action) {
   if (action.type === "CLEAR_LIST") {
     return { ...state, list: [], searchedList: [] };
   }
-  
+
   if (action.type === "SEARCH_TASK") {
     const newList = state.list.filter((specificItem) => {
       return specificItem.title.toLowerCase().includes(action.payload);
     });
-    console.log(newList)
+    console.log(newList);
     if (action.payload.length < 1) {
       return {
         ...state,
@@ -37,37 +37,37 @@ export default reducer;
 
 // if (action.type === "EDIT_TASK") {
 //   let specificItem = state.list.find(
-  //     (item) => item.state.id === action.payload
+//     (item) => item.state.id === action.payload
 //   );
 //   return {
-  //     ...state,
+//     ...state,
 //     editId: actiscription,
 //   };
 // }
 // if (action.type === "END_EDIT") {
-  //   try {
+//   try {
 //     const newList = state.list.map((item) => {
-  //       if (item) {
-    //         if (item.state.id === state.editId) {
+//       if (item) {
+//         if (item.state.id === state.editId) {
 //           const { title } = item;
 //           return {
-  //             ...item,
-  //             title: action.payload,
-  //             description: action.description,
-  //           };
+//             ...item,
+//             title: action.payload,
+//             description: action.description,
+//           };
 //           return item;
 //         }
 //       }
 //     });
 //     return {
-  //       ...state,
+//       ...state,
 //       list: newList,
 //       searchedList: newList,
 //       editId: null,
 //       editName: action.payload,
 //     };
 //   } catch (error) {
-  //     console.log(error);
+//     console.log(error);
 //   }
 // }
 
