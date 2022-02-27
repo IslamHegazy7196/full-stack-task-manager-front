@@ -202,7 +202,7 @@ Grocery List
   justify-content: center;
 }
 .task {
-  padding: 0.5rem;
+  padding: 0.25rem;
   padding-left: 1rem;
   background: var(--clr-grey-10);
   border-top-left-radius: var(--radius);
@@ -241,17 +241,21 @@ Grocery List
   margin-top: 2rem;
 }
 
+.task-wrapper {
+  padding: 0.25rem 1rem;
+  border-radius: var(--radius);
+  text-transform: capitalize;
+}
 .task-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
   transition: var(--transition);
-  padding: 0.25rem 1rem;
-  border-radius: var(--radius);
-  text-transform: capitalize;
+  
 }
-.task-item:hover {
+
+.task-wrapper:hover {
   color: var(--clr-grey-5);
   background: var(--clr-grey-10);
 }

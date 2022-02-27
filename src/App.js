@@ -1,37 +1,65 @@
 import React from "react";
 import { useState } from "react";
-// import { useEffect } from "react";
-import List from "./List";
-import Alert from "./Alert";
+import { useEffect } from "react";
+import List from "./components/List";
+import Alert from "./components/Alert";
 import { connect } from "react-redux";
-// const getLocalStorage = () => {
-//   let list = localStorage.getItem("list");
-//   if (list) {
-//     return JSON.parse(localStorage.getItem("list"));
-//   } else return [];
-// };
+import axios from "axios";
+const BASE_URL = "http://localhost:5000/api/v1/tasks";
 
-function App({ dispatch, searchedList, editName, list }) {
+function App({ dispatch,list,}) {
   // useStates
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
+  const [editId, setEditId] = useState("1");
   // useRef
   const searchValue = React.useRef("");
+  //  get tasks
+  const getalltasks = () => {
+    try {
+      axios.get(BASE_URL).then((res) => {
+        dispatch({ type: "GET_ALL_TASKS",payload: res.data });   
+       });;
+     } catch (error) {
+       console.log(error);
+     }
+  };
+
   // main functions
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name) {
-      showAlert(true, "danger", "please enter value");
-    } else if (name && isEditing) {
-      dispatch({ type: "END_EDIT", payload: name });
+    if (!name || !description) {
+      showAlert(true, "danger", "please enter two value");
+    } else if (name && description && isEditing) {
+      try {
+        (async()=>{await axios.put((`${BASE_URL}/${editId}`), {
+          title: name,
+          description: description,
+       })})()
+        
+        (async()=>{await getalltasks()})()  
+      } catch (error) {
+        console.log(error);
+      }
       setName("");
+      setDescription("");
       setIsEditing(false);
       showAlert(true, "success", "value changed");
     } else {
-      dispatch({ type: "ADD_TASK", payload: name });
-      showAlert(true, "success", "item added to the list");
-      setName("");
+      try {
+        (async()=>{await axios.post((BASE_URL), {
+          title: name,
+          description: description,
+        })})()
+        showAlert(true, "success", "item added to the list");
+        setName("");
+        setDescription("");
+        (async()=>{await getalltasks()})()
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   // alert function
@@ -44,21 +72,37 @@ function App({ dispatch, searchedList, editName, list }) {
   };
 
   const clearlist = () => {
-    showAlert(true, "danger", "Empty List");
-    dispatch({ type: "CLEAR_LIST" });
+    try {
+      (async()=>{await axios.delete(BASE_URL)})()
+      showAlert(true, "danger", "Empty List");
+      dispatch({ type: "CLEAR_LIST" });
+    } catch (error) {
+      console.log(error);
+      showAlert(true, "danger", "something went wrong");
+    }
   };
   const removeItem = (id) => {
+    try {
+      (async()=>{await axios.delete(`${BASE_URL}/${id}`)})()
+      ;
+      (async()=>{await getalltasks()})()
     showAlert(true, "danger", "item removed");
-    dispatch({ type: "REMOVE_TASK", payload: id });
+    } catch (error) {
+      console.log(error);
+      showAlert(true, "danger", "something went wrong");
+    }
+    
   };
-  const editItem = (id) => {
-    dispatch({ type: "EDIT_TASK", payload: id });
+  const editItem = (id, title, description) => {
     setIsEditing(true);
-    setName(editName);
+    setName(title);
+    setDescription(description);
+    setEditId(id)
   };
-  // useEffect(() => {
-  //   localStorage.setItem("list", JSON.stringify(list));
-  // }, [list]);
+  useEffect(() => {
+    (async()=>{await getalltasks()})()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleSubmit]);
 
   return (
     <section className="section-center">
@@ -78,6 +122,18 @@ function App({ dispatch, searchedList, editName, list }) {
           <button type="submit" className="submit-btn">
             {isEditing ? "Edit" : "Add"}
           </button>
+        </div>
+      </form>
+      <form className="task-form" onSubmit={handleSubmit}>
+        <p>description</p>
+        <div className="form-control">
+          <input
+            type="text"
+            className="task"
+            placeholder="Add simple description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
       </form>
       <form className="task-form" onSubmit={handleSubmit}>
@@ -105,8 +161,8 @@ function App({ dispatch, searchedList, editName, list }) {
   );
 }
 function mapStateToProps(state) {
-  const { list, searchedList, searchTerm, editName } = state;
+  const { list, } = state;
 
-  return { list, searchedList, searchTerm, editName };
+  return { list, };
 }
 export default connect(mapStateToProps)(App);
